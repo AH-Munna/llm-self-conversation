@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LLM Conversation Testing System</title>
+    <meta name="description" content="Test AI-to-AI conversations with OpenAI-compatible LLM APIs">
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+
+<body>
+    <div class="container">
+        <!-- Header -->
+        <header class="header">
+            <h1>🤖 LLM Conversation Testing</h1>
+            <p class="subtitle">Watch AI models converse in real-time</p>
+        </header>
+
+        <!-- Sidebar Buttons -->
+        <div class="sidebar-buttons">
+            <button id="openApiConfigBtn" class="sidebar-btn" title="API Configuration">
+                ⚙️
+            </button>
+            <button id="openCharacterConfigBtn" class="sidebar-btn" title="Character Management">
+                👥
+            </button>
+        </div>
+
+        <!-- Main Conversation Area -->
+        <div class="main-conversation">
+            <section class="conversation-panel">
+                <div class="conversation-header">
+                    <h2>💬 Conversation</h2>
+                    <div class="header-controls">
+                        <select id="characterPairSelect" class="select-field">
+                            <option value="">-- Select Character Pair --</option>
+                        </select>
+                        <select id="conversationSelect" class="select-field">
+                            <option value="new">+ New Conversation</option>
+                        </select>
+                        <div class="turn-counter">
+                            <span id="turnCount">0</span> turns
+                        </div>
+                    </div>
+                </div>
+
+                <div id="conversationContainer" class="conversation-container">
+                    <div class="empty-state">
+                        <div class="empty-icon">🎭</div>
+                        <p>Select or create a character pair to start!</p>
+                    </div>
+                </div>
+
+                <div class="conversation-controls">
+                    <button id="startConversationBtn" class="btn btn-primary btn-large">
+                        ▶️ Start (10 turns)
+                    </button>
+                    <button id="stopConversationBtn" class="btn btn-warning btn-large" disabled>
+                        ⏹️ Stop
+                    </button>
+                    <button id="continueConversationBtn" class="btn btn-secondary btn-large" disabled>
+                        ➕ Continue (10)
+                    </button>
+                    <button id="deleteConvBtn" class="btn btn-danger" disabled>
+                        🗑️ Delete Conv
+                    </button>
+                </div>
+
+                <div id="conversationStatus" class="status-message"></div>
+            </section>
+        </div>
+
+        <!-- API Configuration Modal (Tabbed) -->
+        <div id="apiConfigModal" class="modal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h2>⚙️ API Configuration</h2>
+                    <button class="modal-close" data-modal="apiConfigModal">&times;</button>
+                </div>
+
+                <div class="modal-body">
+                    <!-- System Prompt -->
+                    <div class="form-group">
+                        <label for="systemPrompt">Global System Prompt</label>
+                        <textarea id="systemPrompt" placeholder="Universal system prompt for all conversations..."
+                            class="textarea-field" rows="4"></textarea>
+                        <button id="saveSystemPromptBtn" class="btn btn-secondary">Save System Prompt</button>
+                    </div>
+
+                    <hr class="separator">
+
+                    <!-- Tabs for API Configs -->
+                    <div class="tabs">
+                        <button class="tab-btn active" data-tab="api1">API Config 1 (Character 1)</button>
+                        <button class="tab-btn" data-tab="api2">API Config 2 (Character 2)</button>
+                    </div>
+
+                    <!-- API Config 1 Tab -->
+                    <div class="tab-content active" id="api1">
+                        <div class="form-group">
+                            <label for="baseUrl1">Base URL</label>
+                            <input type="text" id="baseUrl1" placeholder="https://api.example.com/v1"
+                                class="input-field">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="apiKey1">API Key</label>
+                            <input type="password" id="apiKey1" placeholder="sk-..." class="input-field">
+                        </div>
+
+                        <button id="fetchModels1Btn" class="btn btn-secondary">Fetch Models</button>
+                        <button id="saveConfig1Btn" class="btn btn-primary">Save Config 1</button>
+
+                        <div id="config1Status" class="status-message"></div>
+                    </div>
+
+                    <!-- API Config 2 Tab -->
+                    <div class="tab-content" id="api2">
+                        <div class="form-group">
+                            <label for="baseUrl2">Base URL</label>
+                            <input type="text" id="baseUrl2" placeholder="https://api.example.com/v1"
+                                class="input-field">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="apiKey2">API Key</label>
+                            <input type="password" id="apiKey2" placeholder="sk-..." class="input-field">
+                        </div>
+
+                        <button id="fetchModels2Btn" class="btn btn-secondary">Fetch Models</button>
+                        <button id="saveConfig2Btn" class="btn btn-primary">Save Config 2</button>
+
+                        <div id="config2Status" class="status-message"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Character Management Modal (90% width) -->
+        <div id="characterModal" class="modal">
+            <div class="modal-content modal-xlarge">
+                <div class="modal-header">
+                    <h2>👥 Character Management</h2>
+                    <button class="modal-close" data-modal="characterModal">&times;</button>
+                </div>
+
+                <div class="modal-body">
+                    <div class="character-pair-selector">
+                        <button id="newPairBtn" class="btn btn-primary">+ Create New Character Pair</button>
+                    </div>
+
+                    <div id="characterDetailsSection" style="display: none;">
+                        <hr class="separator">
+
+                        <div class="character-grid">
+                            <!-- Character 1 -->
+                            <div class="character-column">
+                                <h3>Character 1 (API Config 1)</h3>
+
+                                <div class="form-group">
+                                    <label for="editChar1Name">Name</label>
+                                    <input type="text" id="editChar1Name" class="input-field">
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="editChar1Model">Model</label>
+                                    <select id="editChar1Model" class="input-field">
+                                        <option value="">Select model...</option>
+                                    </select>
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="editChar1Definition">Definition</label>
+                                    <textarea id="editChar1Definition" class="textarea-field" rows="8"></textarea>
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="editChar1StartMsg">Starting Message</label>
+                                    <input type="text" id="editChar1StartMsg" class="input-field">
+                                </div>
+                            </div>
+
+                            <!-- Character 2 -->
+                            <div class="character-column">
+                                <h3>Character 2 (API Config 2)</h3>
+
+                                <div class="form-group">
+                                    <label for="editChar2Name">Name</label>
+                                    <input type="text" id="editChar2Name" class="input-field">
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="editChar2Model">Model</label>
+                                    <select id="editChar2Model" class="input-field">
+                                        <option value="">Select model...</option>
+                                    </select>
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="editChar2Definition">Definition</label>
+                                    <textarea id="editChar2Definition" class="textarea-field" rows="8"></textarea>
+                                </div>
+                            </div>
+                        </div>
+
+                        <button id="saveCharacterEditsBtn" class="btn btn-primary btn-large">Save Changes</button>
+                        <button id="deletePairBtn" class="btn btn-danger">Delete Character Pair</button>
+                        <div id="editCharStatus" class="status-message"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- New Character Pair Modal (Nested) -->
+        <div id="newPairModal" class="modal modal-nested">
+            <div class="modal-content modal-xlarge">
+                <div class="modal-header">
+                    <h2>✨ Create New Character Pair</h2>
+                    <button class="modal-close" data-modal="newPairModal">&times;</button>
+                </div>
+
+                <div class="modal-body">
+                    <div class="character-grid">
+                        <!-- Character 1 Column -->
+                        <div class="character-column">
+                            <h3>Character 1 (API Config 1)</h3>
+
+                            <div class="form-group">
+                                <label for="newChar1Name">Name</label>
+                                <input type="text" id="newChar1Name" placeholder="e.g., Alice" class="input-field">
+                            </div>
+
+                            <div class="form-group">
+                                <label for="newChar1Model">Model (from API 1)</label>
+                                <select id="newChar1Model" class="input-field">
+                                    <option value="">Select model...</option>
+                                </select>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="newChar1Definition">Character Definition</label>
+                                <textarea id="newChar1Definition" placeholder="Personality, background, style..."
+                                    class="textarea-field" rows="6"></textarea>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="newChar1StartMsg">Starting Message</label>
+                                <input type="text" id="newChar1StartMsg" placeholder="First message..."
+                                    class="input-field">
+                            </div>
+                        </div>
+
+                        <!-- Character 2 Column -->
+                        <div class="character-column">
+                            <h3>Character 2 (API Config 2)</h3>
+
+                            <div class="form-group">
+                                <label for="newChar2Name">Name</label>
+                                <input type="text" id="newChar2Name" placeholder="e.g., Bob" class="input-field">
+                            </div>
+
+                            <div class="form-group">
+                                <label for="newChar2Model">Model (from API 2)</label>
+                                <select id="newChar2Model" class="input-field">
+                                    <option value="">Select model...</option>
+                                </select>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="newChar2Definition">Character Definition</label>
+                                <textarea id="newChar2Definition" placeholder="Personality, background, style..."
+                                    class="textarea-field" rows="6"></textarea>
+                            </div>
+                        </div>
+                    </div>
+
+                    <button id="createPairBtn" class="btn btn-primary btn-large">Create Character Pair</button>
+                    <div id="newPairStatus" class="status-message"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Loading Overlay -->
+    <div id="loadingOverlay" class="loading-overlay">
+        <div class="loading-spinner"></div>
+        <p class="loading-text">AI models are conversing...</p>
+    </div>
+
+    <script src="/static/app.js"></script>
+</body>
+
+</html>

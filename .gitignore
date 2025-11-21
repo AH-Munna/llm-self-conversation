@@ -1,0 +1,59 @@
+# API Keys and Secrets
+secrets.txt
+*.key
+*.pem
+.env
+.env.local
+
+# Python
+venv/
+env/
+ENV/
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+*.log
+
+# Node.js (if you add any JS tooling)
+node_modules/
+package-lock.json
+yarn.lock
+
+# Project specific - sensitive data
+data/api_config_1.json
+data/api_config_2.json
+data/system_prompt.json
+data/characters
+
+# Temporary files
+*.tmp
+*.bak
+*.cache

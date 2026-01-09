@@ -40,10 +40,6 @@ Navigate to: **http://localhost:8000**
 - `requirements.txt` - Python dependencies
 - `venv/` - Virtual environment
 
-## 📖 Documentation
-
-See [walkthrough.md](file:///home/ah-munna/.gemini/antigravity/brain/c120df5a-0fe7-4ed2-8c9a-65f5524fd31b/walkthrough.md) for detailed usage instructions.
-
 ## 🎯 How It Works
 
 1. **Character 1** starts with a predefined message

@@ -57,3 +57,4 @@ data/characters
 *.tmp
 *.bak
 *.cache
+ai-agent-platform/
